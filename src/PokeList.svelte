@@ -4,7 +4,14 @@
   import { onMount } from "svelte";
   import localForage from "localforage";
   import PokeCard from "./PokeCard.svelte";
-  import { searchValue, pokemonArr, orderValue } from "./stores";
+  import {
+    searchValue,
+    pokemonArr,
+    orderValue,
+    offsetValue,
+    pokeCount,
+  } from "./stores";
+  import Pagination from "./Pagination.svelte";
 
   let ps = new PokemonService();
   let pokemons: Pokemon[] = [];
@@ -12,29 +19,9 @@
   let orderStr;
 
   onMount(() => {
-    localForage
-      .ready()
-      .then(() => {
-        localForage
-          .getItem("pokeArray")
-          .then((res: Pokemon[]) => {
-            if (res) {
-              console.log("Loaded from local forage");
-              pokemons = res;
-              pokemonArr.update((value) => pokemons);
-            } else {
-              loadAllPokemons();
-            }
-          })
-          .catch(() => {
-            console.log("Loaded from api");
-            loadAllPokemons();
-          });
-      })
-      .catch(() => {
-        console.log("Loaded from api");
-        loadAllPokemons();
-      });
+    loadPokemonDetails(20, 120);
+
+    //pokeCount.update((value) => 1128);
   });
 
   searchValue.subscribe((value) => {
@@ -71,12 +58,23 @@
     }
   });
 
-  function loadAllPokemons() {
-    ps.getPokemonNameList().then((res) => {
+  function loadOnOffset() {
+    offsetValue.subscribe((value) => {
+      loadPokemonDetails(value);
+    });
+  }
+
+  function loadPokemonDetails(limit: number = 20, offset: number = 0) {
+    ps.getPokemonNameList(limit, offset).then((res) => {
+      pokeCount.update((value) => res.count);
       const pokeNames = res.results.map((ele) => ele.name);
+
       getCallPokemons(pokeNames).then((res) => {
-        pokemons = res.map((ele) => pokemonAdapter(ele));
-        localForage.setItem("pokeArray", pokemons);
+        pokemons = res.map((ele: any) => {
+          localForage.setItem("pokemon_" + ele.name, ele);
+          return pokemonAdapter(ele);
+        });
+
         pokemonArr.update((value) => pokemons);
       });
     });
@@ -121,6 +119,8 @@
     <PokeCard {pokemon} />
   {/each}
 </div>
+
+<Pagination />
 
 <style>
   .list-container {
