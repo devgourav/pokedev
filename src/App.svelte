@@ -1,23 +1,25 @@
 <script lang="ts">
-  import Filter from "./Filter.svelte";
-  import Header from "./Header.svelte";
+  import { onMount } from "svelte";
 
-  import PokeList from "./PokeList.svelte";
-  import Sidebar from "./Sidebar.svelte";
+  import Filter from "./views/Filter.svelte";
+  import Header from "./views/Header.svelte";
+  import Footer from "./views/Footer.svelte";
+  import PokeList from "./views/PokeList.svelte";
+
+  import { pageOptions } from "./stores";
 </script>
 
 <Header />
 
 <div class="data-container">
-  <!-- <div>
-    <Sidebar />
-  </div> -->
   <div>
     <Filter />
 
-    <PokeList />
+    <PokeList pageOpt={$pageOptions} />
   </div>
 </div>
+
+<Footer />
 
 <style>
   @import url("https://fonts.googleapis.com/css2?family=Epilogue:wght@400;600&display=swap");

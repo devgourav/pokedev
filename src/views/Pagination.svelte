@@ -1,45 +1,66 @@
 <script lang="ts">
-  import { pokeCount, limitValue } from "./stores";
+  import { createEventDispatcher, onMount } from "svelte";
+
+  import { pageOptions, pageSelected, totalItemCount } from "../stores";
 
   const PAGE_NO_LEN = 10;
+  const dispatch = createEventDispatcher();
 
   let paginationArr = [null];
   let fullPaginationArr = [null];
   let selectedPage = 1;
   let pageCount = 1;
+  export let pageOpt;
 
-  pokeCount.subscribe((value) => {
-    const count = value;
+  onMount(() => {
+    updatePageCount();
+  });
 
-    if (value > 0) {
-      pageCount = Math.floor(count / $limitValue);
-    }
+  pageOptions.subscribe((value) => {
+    console.log(
+      "🚀 ~ file: Pagination.svelte ~ line 18 ~ totalItemCount.subscribe ~ res",
+      value
+    );
+    pageOpt = value;
+    updatePageCount();
+  });
+
+  function updatePageCount() {
+    pageCount = Math.floor(pageOpt.totalItemCount / pageOpt.itemsInPage);
 
     fullPaginationArr = new Array(pageCount)
       .fill(null)
       .map((val, index) => index);
     paginationArr = fullPaginationArr.slice(0, PAGE_NO_LEN);
-  });
+  }
 
   function pageClick(pageNo) {
-    if (pageNo > 0 && pageNo <= pageCount) {
-      selectedPage = pageNo;
-    } else if (pageNo > pageCount) {
-      selectedPage = pageCount;
-    } else {
-      selectedPage = 1;
-    }
+    if (pageNo !== selectedPage) {
+      if (pageNo > 0 && pageNo <= pageCount) {
+        selectedPage = pageNo;
+      } else if (pageNo > pageCount) {
+        selectedPage = pageCount;
+      } else {
+        selectedPage = 1;
+      }
 
-    if (selectedPage + PAGE_NO_LEN - 1 <= pageCount) {
-      paginationArr = fullPaginationArr.slice(
-        selectedPage - 1,
-        selectedPage + PAGE_NO_LEN - 1
-      );
-    } else {
-      paginationArr = fullPaginationArr.slice(
-        pageCount - PAGE_NO_LEN,
-        pageCount
-      );
+      pageSelected.update((value) => selectedPage);
+
+      let startIndex = selectedPage - Math.floor(PAGE_NO_LEN / 2);
+      let endIndex = selectedPage + Math.floor(PAGE_NO_LEN / 2);
+
+      if (startIndex < 0) {
+        paginationArr = fullPaginationArr.slice(0, PAGE_NO_LEN);
+      } else if (endIndex > pageCount) {
+        paginationArr = fullPaginationArr.slice(
+          pageCount - PAGE_NO_LEN,
+          pageCount
+        );
+      } else {
+        paginationArr = fullPaginationArr.slice(startIndex, endIndex);
+      }
+
+      dispatch("pageChange", { selectedPage });
     }
   }
 </script>
@@ -94,7 +115,7 @@
   .pagination-btn {
     padding: 0.7rem;
     margin: 1rem;
-    border: 1px solid blue;
+    border: 1px solid #3c3399;
     cursor: pointer;
     border-radius: 4px;
   }
@@ -111,7 +132,7 @@
 
   .pagination-btn:hover,
   .activeBtn {
-    background-color: blue;
+    background-color: #3c3399;
     color: white;
   }
 
@@ -119,6 +140,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-bottom: 2rem;
   }
 
   .button-list {

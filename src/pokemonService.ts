@@ -4,15 +4,19 @@ import localForage from "localforage";
 export class PokemonService {
   constructor() {}
 
-  async getPokemonNameList(limit: number = 0, offset: number = 0) {
-    const res = await fetch(
-      `${baseUrl}pokemon/?limit=${limit}&offset=${offset}`
-    );
-    if (res.ok) {
-      console.log("pokenames from api");
-      return res.json();
-    }
-    return null;
+  async getPokemonNameList(limit: number) {
+    return localForage.getItem("pokemon_list").then(async (val) => {
+      if (val) {
+        return Promise.resolve(val);
+      } else {
+        const res = await fetch(`${baseUrl}pokemon/?limit=${limit}`);
+        if (res.ok) {
+          console.log("pokemon names from api");
+          return res.json();
+        }
+        return null;
+      }
+    });
   }
 
   async getPokemonByName(name) {

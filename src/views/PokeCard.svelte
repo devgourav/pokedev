@@ -1,5 +1,6 @@
 <script lang="ts">
-  import type { Pokemon } from "./pokemon.model";
+  import type { Pokemon } from "../pokemon.model";
+  import { decimeterToFeet } from "../utility";
 
   export let pokemon: Pokemon;
 </script>
@@ -22,12 +23,12 @@
     <div class="weight">
       <p>Weight</p>
 
-      {pokemon.weight}
+      {pokemon.weight / 10} kg
     </div>
 
     <div class="height">
       <p>Height</p>
-      {pokemon.height}
+      {decimeterToFeet(pokemon.height)}
     </div>
   </div>
 </div>
