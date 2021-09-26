@@ -6,4 +6,10 @@ function decimeterToFeet(inp) {
   return `${Math.floor(feet)}' ${inches}''`;
 }
 
-export { decimeterToFeet };
+function kgsToPound(inp) {
+  let pounds = inp * 2.20462;
+
+  return pounds.toFixed(2);
+}
+
+export { decimeterToFeet, kgsToPound };

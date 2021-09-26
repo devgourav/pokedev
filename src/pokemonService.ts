@@ -5,8 +5,9 @@ export class PokemonService {
   constructor() {}
 
   async getPokemonNameList(limit: number) {
-    return localForage.getItem("pokemon_list").then(async (val) => {
+    return localForage.getItem("pokemon_list").then(async (val: any[]) => {
       if (val) {
+        val["results"] = val["results"].slice(0, limit);
         return Promise.resolve(val);
       } else {
         const res = await fetch(`${baseUrl}pokemon/?limit=${limit}`);
@@ -35,5 +36,25 @@ export class PokemonService {
         return null;
       }
     });
+  }
+
+  async getPokemonSpecies(url) {
+    const res = await fetch(url);
+
+    if (res.ok) {
+      return res.json();
+    }
+
+    return null;
+  }
+
+  async getEvolutionChain(url) {
+    const res = await fetch(url);
+
+    if (res.ok) {
+      return res.json();
+    }
+
+    return null;
   }
 }

@@ -10,21 +10,24 @@
     orderValue,
     totalItemCount,
     pageSelected,
-    itemsInPage,
   } from "../stores";
   import Pagination from "./Pagination.svelte";
+  import PokeModal from "./PokeModal.svelte";
+  import { fade, scale } from "svelte/transition";
 
   let ps = new PokemonService();
   let pokemons: Pokemon[] = [];
   let searchStr;
   let orderStr;
   export let pageOpt;
-  const POKEMON_LIMIT = 1118;
+  const POKEMON_LIMIT = 898;
   let pokeNames = [];
   let isOrderFilter = false;
   let isSearchFilter = false;
   let filterList = [];
   let orderList = [];
+  let isShowModal = false;
+  let modalPokemon: Pokemon;
 
   const whenPageClick = (event) =>
     getPokemonListPerPage(event.detail.selectedPage);
@@ -163,6 +166,13 @@
       weight: ele.weight,
       frontImage: ele.sprites.front_default,
       types: ele.types.map((type) => type.type.name),
+      abilities: ele.abilities.map((ability) => ability.ability.name),
+      base_experience: ele.base_experience,
+      moves: ele.moves.map((move) => move.move.name),
+      species: ele.species,
+      stats: ele.stats.map((stat) => {
+        return { name: stat.stat.name, base_stat: stat.base_stat };
+      }),
     };
 
     return pokemon;
@@ -176,7 +186,30 @@
 
   //   loadPokemonDetails(pokemonList);
   // });
+
+  const modelOpen = (event) => {
+    console.log(
+      "🚀 ~ file: PokeList.svelte ~ line 191 ~ modelOpen ~ event",
+      event.detail.id
+    );
+    modalPokemon = pokemons.find((ele) => ele.id == event.detail.id);
+    console.log(
+      "🚀 ~ file: PokeList.svelte ~ line 192 ~ modelOpen ~ modalPokemon",
+      modalPokemon
+    );
+    isShowModal = true;
+  };
 </script>
+
+<!-- {#if isShowModal}
+  <PokeModal {pokemon} on:modalClose={()=>isShowModal = false} />
+{/if} -->
+
+{#if isShowModal}
+  <div in:scale out:fade>
+    <PokeModal {modalPokemon} on:modalClose={() => (isShowModal = false)} />
+  </div>
+{/if}
 
 <div class="showing-text">
   {#if isSearchFilter == true}
@@ -188,7 +221,7 @@
 
 <div class="list-container">
   {#each pokemons as pokemon}
-    <PokeCard {pokemon} />
+    <PokeCard {pokemon} on:modalOpen={modelOpen} />
   {/each}
 </div>
 

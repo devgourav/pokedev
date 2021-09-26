@@ -127,9 +127,6 @@
     align-items: center;
   }
 
-  .option-btn {
-  }
-
   .pagination-btn:hover,
   .activeBtn {
     background-color: #3c3399;

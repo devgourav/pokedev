@@ -1,11 +1,17 @@
 <script lang="ts">
   import type { Pokemon } from "../pokemon.model";
   import { decimeterToFeet } from "../utility";
+  import { createEventDispatcher } from "svelte";
 
   export let pokemon: Pokemon;
+  const dispatch = createEventDispatcher();
+
+  function openModel() {
+    dispatch("modalOpen", { id: pokemon.id });
+  }
 </script>
 
-<div class="pokeCard">
+<div class="pokeCard" on:click={() => openModel()}>
   <div class="avatar">
     <img src={pokemon.frontImage} alt={pokemon.name} />
   </div>

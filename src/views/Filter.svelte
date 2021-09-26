@@ -53,7 +53,7 @@
     timer = setTimeout(() => {
       if (searchStr.length >= 3 || searchStr.length == 0) {
         isSearchErr = false;
-        searchValue.update((value) => searchStr);
+        searchValue.update(() => searchStr);
       } else {
         isSearchErr = true;
       }
@@ -61,7 +61,7 @@
   }
 
   function order() {
-    orderValue.update((value) => orderStr);
+    orderValue.update(() => orderStr);
   }
 
   // function typeSelect() {

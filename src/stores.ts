@@ -25,3 +25,5 @@ export const pageOptions = derived(
     });
   }
 );
+
+export const openModalById = writable(1);
