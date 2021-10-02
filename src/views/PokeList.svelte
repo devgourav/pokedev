@@ -196,18 +196,16 @@
   };
 
   const getFamily = (event) => {
-    console.log(
-      "🚀 ~ file: PokeList.svelte ~ line 204 ~ getFamily ~ event",
-      event
-    );
+    ps.getPokemonByName(event.detail.name).then((res) => {
+      isShowModal = true;
+      modalPokemon = pokemonAdapter(res);
+      console.log(
+        "🚀 ~ file: PokeList.svelte ~ line 204 ~ ps.getPokemonByName ~ modalPokemon",
+        modalPokemon
+      );
 
-    modalPokemon = pokemons.find(
-      (ele: Pokemon) => ele.name == event.detail.name
-    );
-
-    isShowModal = true;
-
-    modalPokemonName.update((value) => modalPokemon);
+      modalPokemonName.update((value) => modalPokemon);
+    });
   };
 </script>
 

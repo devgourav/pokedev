@@ -38,7 +38,7 @@
       res
     );
 
-    if (Object.keys(res).length > 0) {
+    if (res && Object.keys(res).length > 0) {
       getDetailedData(res);
     }
   });
