@@ -2,13 +2,9 @@ import { derived, readable, writable } from "svelte/store";
 
 export const searchValue = writable("");
 
-export const pokemonArr = writable([]);
-
 export const orderValue = writable("");
 
 export const typeFilter = writable("");
-
-export const offsetValue = writable(0);
 
 export const totalItemCount = writable(0);
 
@@ -26,4 +22,4 @@ export const pageOptions = derived(
   }
 );
 
-export const openModalById = writable(1);
+export const modalPokemonName = writable({});

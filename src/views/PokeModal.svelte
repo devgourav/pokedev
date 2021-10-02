@@ -4,11 +4,12 @@
   import { PokemonService } from "../pokemonService";
   import { decimeterToFeet, kgsToPound } from "../utility";
   import { pokeColor } from "../data/color";
-  import { openModalById } from "../stores";
+  import { modalPokemonName } from "../stores";
+  import Loader from "./Loader.svelte";
 
   export let modalPokemon: Pokemon;
+  let pokemon: Pokemon;
 
-  const pokemon: Pokemon = modalPokemon;
   const dispatch = createEventDispatcher();
   let ps = new PokemonService();
   let isLoading = true;
@@ -20,18 +21,37 @@
   $: cssVarStyles = `--bg-color:${bgColor};--text-color:${textColor}`;
 
   onMount(() => {
-    getDetailedData();
+    getDetailedData(modalPokemon);
   });
 
   function closeModal() {
     dispatch("modalClose", { close: true });
   }
 
-  function openNewModal(id) {
-    openModalById.update(() => id);
-  }
+  const sendFamily = (pokeName) => {
+    dispatch("sendFamily", { name: pokeName });
+  };
 
-  function getDetailedData() {
+  modalPokemonName.subscribe((res: Pokemon) => {
+    console.log(
+      "🚀 ~ file: PokeModal.svelte ~ line 35 ~ modalPokemonName.subscribe ~ res",
+      res
+    );
+
+    if (Object.keys(res).length > 0) {
+      getDetailedData(res);
+    }
+  });
+
+  function getDetailedData(data: Pokemon) {
+    console.log(
+      "🚀 ~ file: PokeModal.svelte ~ line 49 ~ getDetailedData ~ data",
+      data
+    );
+
+    pokemon = data;
+
+    isLoading = true;
     ps.getPokemonSpecies(pokemon.species.url).then((res) => {
       if (res) {
         pokemon.speciesData = speciesAdapter(res);
@@ -108,8 +128,8 @@
 </script>
 
 <div class="modal-screen">
-  <div class="modal-container" style={cssVarStyles}>
-    {#if !isLoading}
+  {#if !isLoading}
+    <div class="modal-container" style={cssVarStyles}>
       <div class="close-btn" on:click={() => closeModal()}>✘</div>
       <div class="row">
         <div class="col">
@@ -159,17 +179,21 @@
       <div class="row family-row">
         <div class="label">Family</div>
         <div class="family">
-          <!-- {pokemon.evolution
-            .map((ele) => ele.name)
-            .reduce((a, b) => a + "  " + b)} -->
-
           {#each pokemon.evolution as name}
-            <div class="link"><span>{name.name}</span></div>
+            <div class="link" on:click={() => sendFamily(name.name)}>
+              <span>{name.name}</span>
+            </div>
           {/each}
         </div>
       </div>
-    {/if}
-  </div>
+    </div>
+  {/if}
+
+  {#if isLoading}
+    <div class="modal-container" style={cssVarStyles}>
+      <Loader />
+    </div>
+  {/if}
 </div>
 
 <style>

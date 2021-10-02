@@ -26,7 +26,7 @@
   });
 
   function updatePageCount() {
-    pageCount = Math.floor(pageOpt.totalItemCount / pageOpt.itemsInPage);
+    pageCount = Math.ceil(pageOpt.totalItemCount / pageOpt.itemsInPage);
 
     fullPaginationArr = new Array(pageCount)
       .fill(null)

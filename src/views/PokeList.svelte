@@ -6,14 +6,15 @@
   import PokeCard from "./PokeCard.svelte";
   import {
     searchValue,
-    pokemonArr,
     orderValue,
     totalItemCount,
     pageSelected,
+    modalPokemonName,
   } from "../stores";
   import Pagination from "./Pagination.svelte";
   import PokeModal from "./PokeModal.svelte";
-  import { fade, scale } from "svelte/transition";
+  import { fade, fly, scale } from "svelte/transition";
+  import Loader from "./Loader.svelte";
 
   let ps = new PokemonService();
   let pokemons: Pokemon[] = [];
@@ -28,6 +29,8 @@
   let orderList = [];
   let isShowModal = false;
   let modalPokemon: Pokemon;
+
+  let isPokemonLoading = false;
 
   const whenPageClick = (event) =>
     getPokemonListPerPage(event.detail.selectedPage);
@@ -90,10 +93,14 @@
   function fetchPokemonList(limit: number) {
     ps.getPokemonNameList(limit).then((res) => {
       console.log(
-        "🚀 ~ file: PokeList.svelte ~ line 65 ~ ps.getPokemonNameList ~ res",
-        res.count
+        "🚀 ~ file: PokeList.svelte ~ line 95 ~ ps.getPokemonNameList ~ res",
+        res
       );
-      totalItemCount.update((value) => res.count);
+      console.log(
+        "🚀 ~ file: PokeList.svelte ~ line 65 ~ ps.getPokemonNameList ~ res",
+        res.results.length
+      );
+      totalItemCount.update((value) => res.results.length);
       pokeNames = res.results.map((ele, index) => {
         return { name: ele.name, id: index + 1 };
       });
@@ -105,6 +112,7 @@
   }
 
   function getPokemonListPerPage(pageNo: number) {
+    isPokemonLoading = true;
     let startIndex = 0;
 
     if (pageNo > 1) {
@@ -145,7 +153,7 @@
         return pokemonAdapter(ele);
       });
 
-      pokemonArr.update((value) => pokemons);
+      isPokemonLoading = false;
     });
   }
 
@@ -178,36 +186,38 @@
     return pokemon;
   }
 
-  // pageSelected.subscribe((value) => {
-  //   const start = (value - 1) * pageOpt.itemsInPage;
-  //   const end = start + pageOpt.itemsInPage - 1;
-
-  //   let pokemonList = pokemons.slice(start, end);
-
-  //   loadPokemonDetails(pokemonList);
-  // });
-
-  const modelOpen = (event) => {
-    console.log(
-      "🚀 ~ file: PokeList.svelte ~ line 191 ~ modelOpen ~ event",
-      event.detail.id
-    );
+  const modalOpen = (event) => {
     modalPokemon = pokemons.find((ele) => ele.id == event.detail.id);
     console.log(
-      "🚀 ~ file: PokeList.svelte ~ line 192 ~ modelOpen ~ modalPokemon",
+      "🚀 ~ file: PokeList.svelte ~ line 192 ~ modalOpen ~ modalPokemon",
       modalPokemon
     );
     isShowModal = true;
   };
+
+  const getFamily = (event) => {
+    console.log(
+      "🚀 ~ file: PokeList.svelte ~ line 204 ~ getFamily ~ event",
+      event
+    );
+
+    modalPokemon = pokemons.find(
+      (ele: Pokemon) => ele.name == event.detail.name
+    );
+
+    isShowModal = true;
+
+    modalPokemonName.update((value) => modalPokemon);
+  };
 </script>
 
-<!-- {#if isShowModal}
-  <PokeModal {pokemon} on:modalClose={()=>isShowModal = false} />
-{/if} -->
-
 {#if isShowModal}
-  <div in:scale out:fade>
-    <PokeModal {modalPokemon} on:modalClose={() => (isShowModal = false)} />
+  <div in:fade out:fade>
+    <PokeModal
+      {modalPokemon}
+      on:modalClose={() => (isShowModal = false)}
+      on:sendFamily={getFamily}
+    />
   </div>
 {/if}
 
@@ -219,11 +229,19 @@
   {/if}
 </div>
 
-<div class="list-container">
-  {#each pokemons as pokemon}
-    <PokeCard {pokemon} on:modalOpen={modelOpen} />
-  {/each}
-</div>
+{#if !isPokemonLoading}
+  <div class="list-container">
+    {#each pokemons as pokemon}
+      <PokeCard {pokemon} on:modalOpen={modalOpen} />
+    {/each}
+  </div>
+{/if}
+
+{#if isPokemonLoading}
+  <div class="loading-container">
+    <Loader />
+  </div>
+{/if}
 
 {#if isSearchFilter == false}
   <Pagination {pageOpt} on:pageChange={whenPageClick} />
@@ -237,6 +255,11 @@
     padding: 2rem;
     min-height: 1500px;
     min-width: 1400px;
+  }
+
+  .loading-container {
+    height: 60vh;
+    width: 1400px;
   }
 
   .showing-text {
