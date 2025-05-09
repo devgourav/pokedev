@@ -4,6 +4,7 @@ export type Pokemon = {
   weight: number;
   name: string;
   frontImage: string;
+  crySound: string;
   types: string[];
   abilities: string[];
   base_experience: number;

@@ -1,20 +1,6 @@
-*Looking for a shareable component template? Go here --> [sveltejs/component-template](https://github.com/sveltejs/component-template)*
+## Description
 
----
-
-# svelte app
-
-This is a project template for [Svelte](https://svelte.dev) apps. It lives at https://github.com/sveltejs/template.
-
-To create a new project based on this template using [degit](https://github.com/Rich-Harris/degit):
-
-```bash
-npx degit sveltejs/template svelte-app
-cd svelte-app
-```
-
-*Note that you will need to have [Node.js](https://nodejs.org) installed.*
-
+This is a app to learn svelte in a fun way by using pokemon api to display the details about the pokemon.
 
 ## Get started
 
@@ -27,7 +13,7 @@ npm install
 
 ...then start [Rollup](https://rollupjs.org):
 
-```bash
+```bash 
 npm run dev
 ```
 

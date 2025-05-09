@@ -173,6 +173,7 @@
       height: ele.height,
       weight: ele.weight,
       frontImage: ele.sprites.front_default,
+      crySound: ele.cries.latest,
       types: ele.types.map((type) => type.type.name),
       abilities: ele.abilities.map((ability) => ability.ability.name),
       base_experience: ele.base_experience,

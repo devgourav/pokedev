@@ -33,11 +33,6 @@
   };
 
   modalPokemonName.subscribe((res: Pokemon) => {
-    console.log(
-      "🚀 ~ file: PokeModal.svelte ~ line 35 ~ modalPokemonName.subscribe ~ res",
-      res
-    );
-
     if (res && Object.keys(res).length > 0) {
       getDetailedData(res);
     }
@@ -46,7 +41,7 @@
   function getDetailedData(data: Pokemon) {
     console.log(
       "🚀 ~ file: PokeModal.svelte ~ line 49 ~ getDetailedData ~ data",
-      data
+      data,
     );
 
     pokemon = data;
@@ -62,16 +57,8 @@
           if (res) {
             pokemon.evolution = [];
             getChain(res.chain);
-            console.log(
-              "🚀 ~ file: PokeModal.svelte ~ line 42 ~ getChain ~ pokemon",
-              pokemon
-            );
-
             setColor(pokemon.speciesData.color);
-
             isLoading = false;
-
-            // pokemon.evolution = pokemon.evolution.map()
           }
         });
       }
@@ -118,12 +105,25 @@
     return `https://assets.pokemon.com/assets/cms2/img/pokedex/full/${id}.png`;
   }
 
+  function getAudioUrl() {
+    console.log(pokemon.crySound);
+    return pokemon.crySound;
+  }
+
   function loadDefaultImage(event) {
     console.log(
       "🚀 ~ file: PokeModal.svelte ~ line 95 ~ loadDefaultImage ~ event",
-      event
+      event,
     );
     event.src = pokemon.frontImage;
+  }
+
+  let audioElement;
+
+  function handleMetadata() {
+    if (audioElement) {
+      audioElement.volume = 0.1;
+    }
   }
 </script>
 
@@ -150,7 +150,7 @@
           <p class="type">{pokemon.types.reduce((a, b) => a + " , " + b)}</p>
           <p class="weight">
             Weight: {pokemon.weight / 10} kg or {kgsToPound(
-              pokemon.weight / 10
+              pokemon.weight / 10,
             )} lbs
           </p>
           <p class="height">
@@ -177,7 +177,7 @@
       </div>
 
       <div class="row family-row">
-        <div class="label">Family</div>
+        <div class="label">Evolution</div>
         <div class="family">
           {#each pokemon.evolution as name}
             <div class="link" on:click={() => sendFamily(name.name)}>
@@ -187,6 +187,15 @@
         </div>
       </div>
     </div>
+
+    <audio
+      id="pokeCry"
+      bind:this={audioElement}
+      autoplay
+      on:loadedmetadata={handleMetadata}
+    >
+      <source src={pokemon.crySound} type="audio/ogg" />
+    </audio>
   {/if}
 
   {#if isLoading}
@@ -212,8 +221,8 @@
 
   .modal-container {
     z-index: 250;
-    width: 700px;
-    height: 700px;
+    width: 30rem;
+    max-height: 800px;
     background-color: white;
     border-radius: 8px;
     padding: 2rem;
@@ -227,13 +236,17 @@
     justify-content: center;
   }
 
+  .row .description {
+    line-height: 1.75rem;
+  }
+
   .col {
     width: 100%;
   }
 
   .avatar img {
-    width: 300px;
-    height: 300px;
+    width: 15rem;
+    height: 15rem;
   }
 
   .name {
@@ -250,7 +263,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    width: 400px;
+    width: 60%;
   }
 
   .stat-row {
@@ -275,7 +288,7 @@
   }
 
   .family .link + .link:before {
-    content: "🠪";
+    content: "► ";
   }
 
   .close-btn {
